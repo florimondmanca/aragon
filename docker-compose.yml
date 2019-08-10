@@ -29,6 +29,10 @@ services:
     build: api
     ports:
       - "8041:8000"
+    volumes:
+      - ./api/app:/usr/code/app
+    environment:
+      PYTHONUNBUFFERED: 1
 
 networks:
   kafka:
