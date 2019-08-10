@@ -31,6 +31,8 @@ services:
     restart: always
     networks:
       - db
+    ports:
+      - "65432:5432"
     volumes:
       - dbdata:/var/lib/postgresql/data
     environment:
