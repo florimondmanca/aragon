@@ -1,1 +1,1 @@
-from .db import database, setup_db
+from .db import database, create_schema

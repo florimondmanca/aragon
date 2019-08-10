@@ -31,7 +31,6 @@ class RuleManager:
         return await self.get(pk=pk)
 
     async def destroy(self, pk: int) -> None:
-        await self.get(pk=pk)  # Ensure rule exists
         await database.fetch_all(rules.delete().where(rules.c.id == pk))
 
 
