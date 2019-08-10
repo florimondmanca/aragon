@@ -45,6 +45,7 @@ services:
     restart: always
     depends_on:
       - db
+      - broker
     networks:
       - default
       - db
@@ -52,12 +53,29 @@ services:
     ports:
       - "8041:8000"
     volumes:
-      - ./api/app:/usr/code/app
+      - ./services/api/app:/usr/code/app
     environment:
       PYTHONUNBUFFERED: 1
       DATABASE_URL: "postgresql://${DATABASE_USER}:${DATABASE_PASSWORD}@db:5432/${DATABASE_NAME}"
       KAFKA_RULES_TOPIC: "rules"
       KAFKA_BOOTSTRAP_SERVERS: "broker:9092"
+
+  worker:
+    build: services/worker
+    restart: always
+    depends_on:
+      - broker
+    networks:
+      - default
+      - kafka
+    ports:
+      - "8042:8000"
+    volumes:
+      - ./services/worker/app:/usr/code/app
+    environment:
+      PYTHONUNBUFFERED: 1
+      KAFKA_RULES_TOPIC: "rules"
+      KAFKA_BROKER: "broker:9092"
 
 networks:
   zk:
