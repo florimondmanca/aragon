@@ -1,4 +1,3 @@
-from databases import DatabaseURL
 from starlette.config import Config
 from starlette.datastructures import CommaSeparatedStrings
 
@@ -6,7 +5,12 @@ config = Config()
 
 TESTING = False
 
-DATABASE_URL = config("DATABASE_URL", cast=DatabaseURL)
+try:
+    from databases import DatabaseURL
+
+    DATABASE_URL = config("DATABASE_URL", cast=DatabaseURL)
+except ImportError:
+    DATABASE_URL = None
 
 KAFKA_RULES_TOPIC = config("KAFKA_RULES_TOPIC")
 
