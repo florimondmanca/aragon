@@ -1,3 +1,3 @@
 # Aragon
 
-Scalable, fault-tolerant rule-based streaming data cleansing application framework for Apache Kafka written in Python.
+Scalable, fault-tolerant rule-based streaming data cleansing application for Apache Kafka, written in Python.
