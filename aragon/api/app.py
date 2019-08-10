@@ -4,7 +4,7 @@ from faust.web import Request, Response, View, Web
 
 from aragon.core import settings
 from aragon.core.codecs import nullable_json
-from aragon.core.models import RuleCreate
+from aragon.core.models import RuleCreate, ACTION_ADD, ACTION_REMOVE
 
 from .orm import create_schema, database
 from .orm.middleware import model_error_middleware
@@ -52,7 +52,7 @@ class RulesList(View):
         async with database.transaction():
             rule = await Rule.create(data=data)
             await app.send(
-                rules_topic, key=str(rule["id"]), value={"action": "create", "data": rule}
+                rules_topic, key=str(rule["id"]), value={"action": ACTION_ADD, "data": rule}
             )
         return self.json(rule, status=201)
 
@@ -70,7 +70,7 @@ class RulesDetail(View):
             rule = await Rule.get(pk=pk)
             await Rule.destroy(pk=pk)
 
-            await app.send(rules_topic, key=str(rule["id"]), value={"action": "delete"})
+            await app.send(rules_topic, key=str(rule["id"]), value={"action": ACTION_REMOVE})
             # Send tombstone to eventually delete item from topic.
             await app.send(rules_topic, key=str(rule["id"]), value=None)
 

@@ -33,8 +33,8 @@ services:
       - db
     ports:
       - "65432:5432"
-    volumes:
-      - dbdata:/var/lib/postgresql/data
+    # volumes:
+    #   - dbdata:/var/lib/postgresql/data
     environment:
       POSTGRES_USER: $DATABASE_USER
       POSTGRES_PASSWORD: $DATABASE_PASSWORD
@@ -62,22 +62,21 @@ services:
       KAFKA_RULES_TOPIC: "rules"
       KAFKA_BOOTSTRAP_SERVERS: "broker:9092"
 
-  # worker:
-  #   build: services/worker
-  #   restart: always
-  #   depends_on:
-  #     - broker
-  #   networks:
-  #     - default
-  #     - kafka
-  #   ports:
-  #     - "8042:8000"
-  #   volumes:
-  #     - ./services/worker/app:/usr/code/app
-  #   environment:
-  #     PYTHONUNBUFFERED: 1
-  #     KAFKA_RULES_TOPIC: "rules"
-  #     KAFKA_BROKER: "broker:9092"
+  worker:
+    build:
+      context: .
+      dockerfile: ./aragon/worker/Dockerfile
+    restart: always
+    depends_on:
+      - broker
+    networks:
+      - kafka
+    volumes:
+      - ./aragon:/usr/code/aragon
+    environment:
+      PYTHONUNBUFFERED: 1
+      KAFKA_RULES_TOPIC: "rules"
+      KAFKA_BOOTSTRAP_SERVERS: "broker:9092"
 
 networks:
   zk:
@@ -86,6 +85,5 @@ networks:
     driver: bridge
   db:
     driver: bridge
-
-volumes:
-  dbdata:
+# volumes:
+#   dbdata:
