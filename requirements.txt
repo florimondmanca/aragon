@@ -1,4 +1,4 @@
-black
-pylint
-rope
-mypy
+faust==1.7.*
+starlette==0.12.*
+databases[postgresql]
+typesystem==0.2.*

@@ -1,9 +1,7 @@
 import sqlalchemy
 from databases import Database
 
-from app import settings
-
-from .middleware import ModelExceptionMiddleware
+from aragon.core import settings
 
 database = Database(url=settings.DATABASE_URL, force_rollback=settings.TESTING)
 metadata = sqlalchemy.MetaData()

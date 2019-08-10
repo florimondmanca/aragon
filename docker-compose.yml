@@ -41,7 +41,9 @@ services:
       POSTGRES_DB: $DATABASE_NAME
 
   api:
-    build: services/api
+    build:
+      context: .
+      dockerfile: ./aragon/api/Dockerfile
     restart: always
     depends_on:
       - db
@@ -53,29 +55,29 @@ services:
     ports:
       - "8041:8000"
     volumes:
-      - ./services/api/app:/usr/code/app
+      - ./aragon:/usr/code/aragon
     environment:
       PYTHONUNBUFFERED: 1
       DATABASE_URL: "postgresql://${DATABASE_USER}:${DATABASE_PASSWORD}@db:5432/${DATABASE_NAME}"
       KAFKA_RULES_TOPIC: "rules"
       KAFKA_BOOTSTRAP_SERVERS: "broker:9092"
 
-  worker:
-    build: services/worker
-    restart: always
-    depends_on:
-      - broker
-    networks:
-      - default
-      - kafka
-    ports:
-      - "8042:8000"
-    volumes:
-      - ./services/worker/app:/usr/code/app
-    environment:
-      PYTHONUNBUFFERED: 1
-      KAFKA_RULES_TOPIC: "rules"
-      KAFKA_BROKER: "broker:9092"
+  # worker:
+  #   build: services/worker
+  #   restart: always
+  #   depends_on:
+  #     - broker
+  #   networks:
+  #     - default
+  #     - kafka
+  #   ports:
+  #     - "8042:8000"
+  #   volumes:
+  #     - ./services/worker/app:/usr/code/app
+  #   environment:
+  #     PYTHONUNBUFFERED: 1
+  #     KAFKA_RULES_TOPIC: "rules"
+  #     KAFKA_BROKER: "broker:9092"
 
 networks:
   zk:
