@@ -1,10 +1,25 @@
 # Aragon
 
-Scalable, fault-tolerant rule-based streaming data cleansing application for Apache Kafka, written in Python.
+Rule-based streaming data cleansing application written in Python. Runs on Apache Kafka _via_ [Faust](https://faust.readthedocs.io).
+
+## Overview
+
+Current features:
+
+- Modern, type-annotated Python (3.7).
+- Fully asynchronous execution.
+- Docker-based execution.
+- Database of rules.
+- Scalable manager/worker architecture _via_ event sourcing.
+
+Planned features:
+
+- Efficient application of word-based and regex-based rules.
+- Read from and output to Kafka topics.
 
 ## Installation
 
-This project entirely runs inside [Docker] and [Docker Compose], so make sure to have these installed.
+This project entirely runs inside [Docker](https://docs.docker.com/install/) and [Docker Compose](https://docs.docker.com/compose/), so make sure to have these installed.
 
 Before starting Docker Compose, create and fill in the following `.env` file:
 
@@ -32,7 +47,7 @@ After running this for the first time, run:
 
 to setup Kafka topics and other resources.
 
-You can interact with the API using any HTTP client, e.g. cURL or [HTTPie](https://httpie.org/):
+You can interact with the `api` using any HTTP client, e.g. [HTTPie](https://httpie.org/):
 
 ```bash
 http get localhost:8041/rules/
@@ -41,7 +56,15 @@ http get localhost:8041/rules/1
 http delete localhost:8041/rules/1
 ```
 
-When creating or deleting a rule, an event is sent to the `rules` topic.
+Workers are notified of additions and removals of rules.
+When creating or deleting a rule, an event is sent to the `rules` topic, which the `worker` consumes:
+
+```bash
+$ docker-compose logs -f worker
+...
+worker_1     | [2019-08-10 21:53:20,351: WARNING]: ADD @b'2': Rule(id=2, pattern='superman', is_regex=False)
+worker_1     | [2019-08-10 21:53:41,595: WARNING]: REMOVE @b'2'
+```
 
 To consume the rules topic for debugging purposes, run:
 
@@ -59,6 +82,7 @@ The `docker-compose.yml` file declares the following services:
 - `broker`: a Kafka broker.
 - `db`: a PostgreSQL database.
 - `api`: web API application (available at http://localhost:8041).
+- `worker`: stream processing worker.
 
 ## Development
 
@@ -66,14 +90,5 @@ The `docker-compose.yml` file declares the following services:
 python -m venv venv
 . venv/bin/activate
 pip install -r requirements.txt
-pip install -r api/requirements.txt
+pip install -r aragon/api/requirements.txt
 ```
-
-## Resources
-
-_Resources used while building this project._
-
-- [Building a streaming fraud detection system with Kafka and Python](https://blog.florimond.dev/building-a-streaming-fraud-detection-system-with-kafka-and-python)
-- [In-Depth Summary of Apache Kafka](https://medium.com/@aozturk/kafka-guide-in-depth-summary-5b3cb6dbc83c)
-- [Docker Compose with Named Volumes and Multiple Networks](https://sandro-keil.de/blog/docker-compose-with-named-volumes-and-multiple-networks/)
-- [Python Uvicorn Alpine Docker image (Gist)](https://gist.github.com/Midnighter/6f848a1b2264fa453706284305673834)

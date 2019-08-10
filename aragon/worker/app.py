@@ -8,8 +8,6 @@ class App(faust.app.App):
     class BootStrategy(faust.app.BootStrategy):
         enable_sensors = False
 
-    # client_only = True
-
 
 app = App("worker", broker=settings.KAFKA_BOOTSTRAP_SERVERS)
 
